@@ -11,11 +11,44 @@ var VideoSchema = mongoose.Schema({
   },
   chapterMarks: [
     {
+      id: {
+        type: String
+      },
       startTime: {
         type: Number
       },
       text: {
         type: String
+      }
+    }
+  ],
+  Questions: [
+    {
+      id: {
+        type: String
+      },
+      question: {
+        type: String
+      },
+      options: {
+        id: {
+          type: String
+        },
+        text: {
+          type: String
+        }
+      },
+      correctAnswer: {
+        type: String
+      },
+      points: {
+        type: Number
+      },
+      duration: {
+        type: Number
+      },
+      checked: {
+        type: Boolean
       }
     }
   ]

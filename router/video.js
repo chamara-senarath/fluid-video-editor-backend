@@ -37,6 +37,32 @@ router.post("/video", async (req, res) => {
   }
 });
 
+//patch video file info
+router.patch("/video", async (req, res) => {
+  let id = req.body.id;
+  try {
+    let video = await Video.findById(id);
+    video.splashDuration = req.body.splashDuration;
+    video.chapterMarks = req.body.chapterMarks;
+    video.questions = req.body.questions;
+    await video.save();
+    res.status(200).send();
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+//retrieve video file infor
+router.get("video", async (req, res) => {
+  let id = req.query.id;
+  try {
+    let video = await Video.findById(id);
+    res.status(200).send(video);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
 //upload video splash
 router.post("/video/splash", upload.single("splash"), async (req, res) => {
   const file = req.file;
