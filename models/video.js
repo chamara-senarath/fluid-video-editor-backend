@@ -11,9 +11,6 @@ var VideoSchema = mongoose.Schema({
   },
   chapterMarks: [
     {
-      id: {
-        type: String
-      },
       startTime: {
         type: Number
       },
@@ -22,11 +19,8 @@ var VideoSchema = mongoose.Schema({
       }
     }
   ],
-  Questions: [
+  questions: [
     {
-      id: {
-        type: String
-      },
       question: {
         type: String
       },

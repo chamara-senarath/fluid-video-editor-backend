@@ -24,7 +24,7 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage });
 
 //upload video info
-router.post("/video", async (req, res) => {
+router.post("/api/video", async (req, res) => {
   var body = {
     title: req.body.title
   };
@@ -38,7 +38,7 @@ router.post("/video", async (req, res) => {
 });
 
 //patch video file info
-router.patch("/video", async (req, res) => {
+router.patch("/api/video", async (req, res) => {
   let id = req.body.id;
   try {
     let video = await Video.findById(id);
@@ -52,8 +52,8 @@ router.patch("/video", async (req, res) => {
   }
 });
 
-//retrieve video file infor
-router.get("video", async (req, res) => {
+//retrieve video file info
+router.get("/api/video", async (req, res) => {
   let id = req.query.id;
   try {
     let video = await Video.findById(id);
@@ -64,7 +64,7 @@ router.get("video", async (req, res) => {
 });
 
 //upload video splash
-router.post("/video/splash", upload.single("splash"), async (req, res) => {
+router.post("/api/video/splash", upload.single("splash"), async (req, res) => {
   const file = req.file;
   if (!file) {
     const error = new Error("Please upload a file");
@@ -75,7 +75,7 @@ router.post("/video/splash", upload.single("splash"), async (req, res) => {
 });
 
 //retrieve video splash
-router.get("/video/splash", async (req, res) => {
+router.get("/api/video/splash", async (req, res) => {
   var id = req.query.id;
   try {
     var files = fs.readdirSync("uploads");
@@ -97,7 +97,7 @@ router.get("/video/splash", async (req, res) => {
 });
 
 //upload video file
-router.post("/video/file", upload.single("videoFile"), async (req, res) => {
+router.post("/api/video/file", upload.single("videoFile"), async (req, res) => {
   const file = req.file;
   if (!file) {
     const error = new Error("Please upload a file");
@@ -108,7 +108,7 @@ router.post("/video/file", upload.single("videoFile"), async (req, res) => {
 });
 
 //retrieve video file
-router.get("/video/file", async (req, res) => {
+router.get("/api/video/file", async (req, res) => {
   var id = req.query.id;
   var files = fs.readdirSync("uploads");
 
