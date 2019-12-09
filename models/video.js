@@ -25,23 +25,29 @@ var VideoSchema = mongoose.Schema({
         type: String
       },
       options: {
-        id: {
-          type: String
-        },
         text: {
           type: String
         }
       },
-      correctAnswer: {
+      answer: {
         type: String
       },
       points: {
+        type: Number
+      },
+      startTime: {
         type: Number
       },
       duration: {
         type: Number
       },
       checked: {
+        type: Boolean
+      },
+      correct: {
+        type: Boolean
+      },
+      isTimed: {
         type: Boolean
       }
     }
