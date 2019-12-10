@@ -24,11 +24,13 @@ var VideoSchema = mongoose.Schema({
       question: {
         type: String
       },
-      options: {
-        text: {
-          type: String
+      options: [
+        {
+          text: {
+            type: String
+          }
         }
-      },
+      ],
       answer: {
         type: String
       },
