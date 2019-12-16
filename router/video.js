@@ -43,6 +43,7 @@ router.patch("/api/video", async (req, res) => {
   try {
     let video = await Video.findById(id);
     video.splashDuration = req.body.splashDuration;
+    video.watermark = req.body.watermark;
     video.chapterMarks = req.body.chapterMarks;
     video.questions = req.body.questions;
     await video.save();
@@ -83,6 +84,43 @@ router.get("/api/video/splash", async (req, res) => {
     var contentType;
     for (var i in files) {
       if (files[i].substr(0, files[i].lastIndexOf(".")) === "splash-" + id) {
+        imgPath = "uploads/" + files[i];
+        var splitArray = files[i].split(".");
+        contentType = "image/" + splitArray[splitArray.length - 1];
+      }
+    }
+    const img = fs.readFileSync(imgPath);
+    res.contentType(contentType);
+    res.status(200).send(img);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+//upload video watermark
+router.post(
+  "/api/video/watermark",
+  upload.single("watermark"),
+  async (req, res) => {
+    const file = req.file;
+    if (!file) {
+      const error = new Error("Please upload a file");
+      error.httpStatusCode = 400;
+      return next(error);
+    }
+    res.status(200).send();
+  }
+);
+
+//retrieve video watermark
+router.get("/api/video/watermark", async (req, res) => {
+  var id = req.query.id;
+  try {
+    var files = fs.readdirSync("uploads");
+    var imgPath;
+    var contentType;
+    for (var i in files) {
+      if (files[i].substr(0, files[i].lastIndexOf(".")) === "watermark-" + id) {
         imgPath = "uploads/" + files[i];
         var splitArray = files[i].split(".");
         contentType = "image/" + splitArray[splitArray.length - 1];

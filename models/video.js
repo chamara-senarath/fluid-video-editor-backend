@@ -9,6 +9,14 @@ var VideoSchema = mongoose.Schema({
   splashDuration: {
     type: Number
   },
+  watermark: {
+    opacity: Number,
+    widthRatio: Number,
+    position: {
+      leftRatio: Number,
+      topRatio: Number
+    }
+  },
   chapterMarks: [
     {
       startTime: {
