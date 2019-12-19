@@ -54,6 +54,7 @@ var VideoSchema = mongoose.Schema({
       checked: {
         type: Boolean
       },
+      //TODO check if this is exist
       correct: {
         type: Boolean
       },
