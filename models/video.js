@@ -50,16 +50,6 @@ var VideoSchema = mongoose.Schema({
       },
       duration: {
         type: Number
-      },
-      checked: {
-        type: Boolean
-      },
-      //TODO check if this is exist
-      correct: {
-        type: Boolean
-      },
-      isTimed: {
-        type: Boolean
       }
     }
   ]
