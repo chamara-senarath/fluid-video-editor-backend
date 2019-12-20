@@ -24,8 +24,13 @@ router.post("/api/insight/video", async (req, res) => {
 
 router.get("/api/insight/views", async (req, res) => {
   let vid = req.query.vid;
+  let range = [0, 20, 25];
   let totalViews = 0;
   let viewsByGender = {};
+
+  let viewsByAge = {};
+  let viewsByLocation = {};
+
   try {
     let videoInsight = await VideoInsight.findOne({ video: vid });
     if (videoInsight) {
@@ -35,9 +40,13 @@ router.get("/api/insight/views", async (req, res) => {
         let user = await User.findById(videoInsight.views[i]);
         users.push(user);
         viewsByGender = getPercentage(users, "gender");
+        viewsByAge = getPercentage(users, "age", range);
+        viewsByLocation = getPercentage(users, "location");
       }
     }
-    res.status(200).send({ totalViews, viewsByGender });
+    res
+      .status(200)
+      .send({ totalViews, viewsByGender, viewsByAge, viewsByLocation });
   } catch (error) {
     res.status(400).send(error);
   }
