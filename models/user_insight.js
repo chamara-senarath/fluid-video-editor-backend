@@ -20,10 +20,13 @@ var UserInsightSchema = mongoose.Schema({
             points: {
               type: Number
             },
-            answered: {
+            is_answered: {
               type: Boolean
             },
-            skipped: {
+            is_correct: {
+              type: Boolean
+            },
+            is_skipped: {
               type: Boolean
             }
           }

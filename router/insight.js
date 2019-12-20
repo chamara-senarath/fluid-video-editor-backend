@@ -1,5 +1,7 @@
 const express = require("express");
 const VideoInsight = require("../models/video_insight");
+const UserInsight = require("../models/user_insight");
+
 const User = require("../models/user");
 
 const router = new express.Router();
@@ -16,6 +18,37 @@ router.post("/api/insight/video", async (req, res) => {
       videoInsight.views.push(uid);
     }
     await videoInsight.save();
+    res.status(200).send();
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+router.post("/api/insight/user", async (req, res) => {
+  let uid = req.body.uid;
+  let vid = req.body.vid;
+  let questions = req.body.questions;
+  let checkpoints = req.body.checkpoints;
+  try {
+    let userInsight = await UserInsight.findOne({ user: uid });
+    if (!userInsight) {
+      userInsight = UserInsight({ user: uid });
+    }
+    let found = false;
+    userInsight.videos.forEach(video => {
+      if ((video.video = vid)) {
+        video.questions = questions;
+        video.checkpoints = checkpoints;
+        found = true;
+      }
+    });
+    if (!found) {
+      userInsight.videos.push({
+        video: vid,
+        questions: questions,
+        checkpoints: checkpoints
+      });
+    }
     res.status(200).send();
   } catch (error) {
     res.status(400).send(error);
