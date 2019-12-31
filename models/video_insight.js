@@ -7,10 +7,17 @@ var VideoInsightSchema = mongoose.Schema({
   },
   views: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User"
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+      },
+      date: { type: Date, default: Date.now }
     }
   ]
+});
+
+VideoInsightSchema.virtual("totalViews").get(function() {
+  return this.views.length;
 });
 
 var VideoInsight = mongoose.model("VideoInsight", VideoInsightSchema);
