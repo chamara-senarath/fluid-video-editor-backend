@@ -26,12 +26,19 @@ var upload = multer({ storage: storage });
 //upload video info
 router.post("/api/video", async (req, res) => {
   var body = {
-    title: req.body.title
+    title: req.body.title,
+    authors: req.body.authors,
+    tags: req.body.tags
   };
   var video = Video(body);
   try {
     await video.save();
-    res.status(200).send({ id: video._id, title: video.title });
+    res.status(200).send({
+      id: video._id,
+      title: video.title,
+      authors: video.authors,
+      tags: video.tags
+    });
   } catch (error) {
     res.status(400).send(error);
   }
@@ -42,6 +49,8 @@ router.patch("/api/video", async (req, res) => {
   let id = req.body.id;
   try {
     let video = await Video.findById(id);
+    video.authors = req.body.authors;
+    video.tags = req.body.tags;
     video.splashDuration = req.body.splashDuration;
     video.watermark = req.body.watermark;
     video.chapterMarks = req.body.chapterMarks;
@@ -129,6 +138,31 @@ router.get("/api/video/watermark", async (req, res) => {
     const img = fs.readFileSync(imgPath);
     res.contentType(contentType);
     res.status(200).send(img);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+//delete video file
+router.delete("/api/video/file", async (req, res) => {
+  let id = req.query.id;
+  try {
+    await Video.findByIdAndDelete(id);
+    var files = fs.readdirSync("uploads");
+    let prefixes = ["videoFile", "splash", "watermark"];
+    prefixes.forEach(prefix => {
+      for (var i in files) {
+        if (
+          files[i].substr(0, files[i].lastIndexOf(".")) ===
+          prefix + "-" + id
+        ) {
+          fs.unlink("uploads/" + files[i], function(err) {
+            if (err) throw err;
+          });
+        }
+      }
+    });
+    res.status(200).send();
   } catch (error) {
     res.status(400).send(error);
   }
