@@ -1,4 +1,5 @@
 const express = require("express");
+const Video = require("../models/video");
 const VideoInsight = require("../models/video_insight");
 const UserInsight = require("../models/user_insight");
 const User = require("../models/user");
@@ -165,12 +166,16 @@ router.get("/api/insight/most_watched", async (req, res) => {
     let totalViews = 0;
     let most_watched;
     videoInsight.forEach(video => {
-      if (video.totalViews > totalViews) {
+      if (video.totalViews >= totalViews) {
         totalViews = video.totalViews;
         most_watched = video.video;
       }
     });
-    res.status(200).send({ id: most_watched });
+    let video = await Video.findById(most_watched);
+
+    res
+      .status(200)
+      .send({ id: most_watched, title: video.title, views: totalViews });
   } catch (error) {
     res.status(400).send(error);
   }
@@ -183,12 +188,33 @@ router.get("/api/insight/least_watched", async (req, res) => {
     let totalViews = videoInsight[0].totalViews;
     let least_watched;
     videoInsight.forEach(video => {
-      if (video.totalViews < totalViews) {
+      if (video.totalViews <= totalViews) {
         totalViews = video.totalViews;
         least_watched = video.video;
       }
     });
-    res.status(200).send({ id: least_watched });
+    let video = await Video.findById(least_watched);
+    res
+      .status(200)
+      .send({ id: least_watched, title: video.title, views: totalViews });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+//get summary
+router.get("/api/insight/summary", async (req, res) => {
+  try {
+    let summary = [];
+    let videoInsight = await VideoInsight.find();
+    for (let i = 0; i < videoInsight.length; i++) {
+      let vid = await videoInsight[i].populate("video").execPopulate();
+      let totalViews = vid.totalViews;
+      let id = vid.video._id;
+      let title = vid.video.title;
+      summary.push({ id, title, totalViews });
+    }
+    res.status(200).send(summary);
   } catch (error) {
     res.status(400).send(error);
   }

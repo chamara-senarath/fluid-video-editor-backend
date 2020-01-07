@@ -13,7 +13,7 @@ var UserInsightSchema = mongoose.Schema({
       },
       questions: [
         {
-          question: {
+          qid: {
             type: mongoose.Schema.Types.ObjectId
           },
           points: {

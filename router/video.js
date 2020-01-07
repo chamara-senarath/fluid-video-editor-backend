@@ -1,6 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const Video = require("../models/video");
+const VideoInsight = require("../models/video_insight");
 const fs = require("fs");
 const router = new express.Router();
 
@@ -71,6 +72,14 @@ router.get("/api/video", async (req, res) => {
   } catch (error) {
     res.status(400).send(error);
   }
+});
+
+//retrieve video list
+router.get("/api/videos", async (req, res) => {
+  try {
+    let videos = await Video.find();
+    res.status(200).send(videos);
+  } catch (error) {}
 });
 
 //upload video splash
@@ -162,6 +171,7 @@ router.delete("/api/video/file", async (req, res) => {
         }
       }
     });
+    await VideoInsight.findOneAndDelete({ video: id });
     res.status(200).send();
   } catch (error) {
     res.status(400).send(error);
