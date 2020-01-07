@@ -79,7 +79,20 @@ router.get("/api/videos", async (req, res) => {
   try {
     let videos = await Video.find();
     res.status(200).send(videos);
-  } catch (error) {}
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+//retrieve videos by name
+router.get("/api/video/search", async (req, res) => {
+  let key = req.query.key;
+  try {
+    let videos = await Video.find({ title: { $regex: key, $options: "i" } });
+    res.status(200).send(videos);
+  } catch (error) {
+    res.status(400).send(error);
+  }
 });
 
 //upload video splash
