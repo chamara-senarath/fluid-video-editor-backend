@@ -50,6 +50,7 @@ router.patch("/api/video", async (req, res) => {
   let id = req.body.id;
   try {
     let video = await Video.findById(id);
+    video.title = req.body.title;
     video.authors = req.body.authors;
     video.tags = req.body.tags;
     video.splashDuration = req.body.splashDuration;

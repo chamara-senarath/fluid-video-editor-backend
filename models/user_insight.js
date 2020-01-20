@@ -16,7 +16,7 @@ var UserInsightSchema = mongoose.Schema({
           qid: {
             type: mongoose.Schema.Types.ObjectId
           },
-          points: {
+          earn: {
             type: Number
           },
           is_answered: {

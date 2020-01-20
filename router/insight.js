@@ -142,19 +142,61 @@ router.get("/api/insight/views", async (req, res) => {
 router.get("/api/insight/user", async (req, res) => {
   let uid = req.query.uid;
   let vid = req.query.vid;
-  let user_video = null;
+  let questions = [];
   try {
-    let userInsight = await UserInsight.findOne({ user: uid });
-    userInsight.videos.forEach(video => {
-      if (video.video == vid) {
-        user_video = {
-          questions: video.questions,
-          checkpoints: video.checkpoints
-        };
-      }
+    let video = await Video.findById(vid);
+    if (!video) {
+      throw Error("Video not Found");
+    }
+    let insight = await UserInsight.findOne({
+      user: uid,
+      videos: { $elemMatch: { video: vid } }
     });
-    res.status(200).send(user_video);
+    if (!insight) {
+      throw Error("Insight not found");
+    }
+
+    let insightQuestions = [
+      ...insight.videos
+        .filter(video => video.video == vid)
+        .map(obj => {
+          return obj.questions;
+        })[0]
+    ];
+    let videoQuestions = video.questions;
+    videoQuestions.forEach(question => {
+      let q = {
+        _id: question._id,
+        qid: question._id,
+        options: question.options,
+        question: question.question,
+        answer: question.answer,
+        duration: question.duration,
+        startTime: question.startTime,
+        points: question.points,
+        is_answered: false,
+        is_skipped: false,
+        is_correct: false,
+        earn: 0
+      };
+      questions.push(q);
+    });
+
+    for (let i = 0; i < questions.length; i++) {
+      let videoQuestion = questions[i];
+      for (let j = 0; j < insightQuestions.length; j++) {
+        let insightQuestion = insightQuestions[j];
+        if (videoQuestion._id.toString() == insightQuestion.qid.toString()) {
+          questions[i].is_answered = insightQuestion.is_answered;
+          questions[i].is_skipped = insightQuestion.is_skipped;
+          questions[i].is_correct = insightQuestion.is_correct;
+          questions[i].earn = insightQuestion.earn;
+        }
+      }
+    }
+    res.status(200).send(questions);
   } catch (error) {
+    console.log(error);
     res.status(400).send(error);
   }
 });
