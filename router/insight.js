@@ -152,17 +152,17 @@ router.get("/api/insight/user", async (req, res) => {
       user: uid,
       videos: { $elemMatch: { video: vid } }
     });
-    if (!insight) {
-      throw Error("Insight not found");
-    }
 
-    let insightQuestions = [
-      ...insight.videos
-        .filter(video => video.video == vid)
-        .map(obj => {
-          return obj.questions;
-        })[0]
-    ];
+    let insightQuestions = [];
+    if (insight) {
+      insightQuestions = [
+        ...insight.videos
+          .filter(video => video.video == vid)
+          .map(obj => {
+            return obj.questions;
+          })[0]
+      ];
+    }
     let videoQuestions = video.questions;
     videoQuestions.forEach(question => {
       let q = {

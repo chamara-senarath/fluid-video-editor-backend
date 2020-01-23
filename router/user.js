@@ -18,4 +18,17 @@ router.post("/api/user", async (req, res) => {
   }
 });
 
+router.get("/api/user", async (req, res) => {
+  let id = req.query.id;
+  try {
+    let user = await User.findById(id);
+    if (user) {
+      res.status(200).send();
+    } else {
+      res.status(204).send();
+    }
+  } catch (error) {
+    res.status(204).send();
+  }
+});
 module.exports = router;

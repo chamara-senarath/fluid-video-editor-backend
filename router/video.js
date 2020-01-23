@@ -2,6 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const Video = require("../models/video");
 const VideoInsight = require("../models/video_insight");
+const UserInsight = require("../models/user_insight");
 const fs = require("fs");
 const router = new express.Router();
 
@@ -186,6 +187,12 @@ router.delete("/api/video/file", async (req, res) => {
       }
     });
     await VideoInsight.findOneAndDelete({ video: id });
+    let doc = await UserInsight.findOne({
+      videos: { $elemMatch: { video: id } }
+    });
+    let tempArr = doc.videos.filter(obj => obj.video != id);
+    doc.videos = tempArr;
+    doc.save();
     res.status(200).send();
   } catch (error) {
     res.status(400).send(error);
