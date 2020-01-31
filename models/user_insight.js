@@ -30,6 +30,9 @@ var UserInsightSchema = mongoose.Schema({
           }
         }
       ],
+      percentage: {
+        type: Number
+      },
       checkpoints: [
         {
           start: {

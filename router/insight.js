@@ -30,6 +30,7 @@ router.post("/api/insight/user", async (req, res) => {
   let uid = req.body.uid;
   let vid = req.body.vid;
   let questions = req.body.questions;
+  let percentage = req.body.percentage;
   let checkpoints = req.body.checkpoints;
   try {
     let userInsight = await UserInsight.findOne({ user: uid });
@@ -40,6 +41,8 @@ router.post("/api/insight/user", async (req, res) => {
     userInsight.videos.forEach(video => {
       if (video.video == vid) {
         video.questions = questions;
+        video.percentage =
+          video.percentage >= percentage ? video.percentage : percentage;
         video.checkpoints = checkpoints;
         found = true;
       }
@@ -48,6 +51,7 @@ router.post("/api/insight/user", async (req, res) => {
       userInsight.videos.push({
         video: vid,
         questions: questions,
+        percentage: percentage,
         checkpoints: checkpoints
       });
     }
@@ -134,6 +138,7 @@ router.get("/api/insight/views", async (req, res) => {
       viewsByLocation
     });
   } catch (error) {
+    console.log(error);
     res.status(400).send(error);
   }
 });
@@ -143,6 +148,7 @@ router.get("/api/insight/user", async (req, res) => {
   let uid = req.query.uid;
   let vid = req.query.vid;
   let questions = [];
+  let percentage = 0;
   try {
     let video = await Video.findById(vid);
     if (!video) {
@@ -155,6 +161,8 @@ router.get("/api/insight/user", async (req, res) => {
 
     let insightQuestions = [];
     if (insight) {
+      let video = insight.videos.find(video => video.video == vid);
+      percentage = video.percentage;
       insightQuestions = [
         ...insight.videos
           .filter(video => video.video == vid)
@@ -194,7 +202,30 @@ router.get("/api/insight/user", async (req, res) => {
         }
       }
     }
-    res.status(200).send(questions);
+    res.status(200).send({ percentage, questions });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+//retrieve all videos of a user
+router.get("/api/insight/user/all", async (req, res) => {
+  let uid = req.query.uid;
+  let videos = null;
+  try {
+    videos = await UserInsight.findOne(
+      { user: uid },
+      { _id: 0, "videos.video": 1, "videos.percentage": 1 }
+    );
+    videos = await videos
+      .populate({
+        path: "videos.video",
+        model: "Video",
+        select: { title: 1 }
+      })
+      .execPopulate();
+
+    res.status(200).send(videos);
   } catch (error) {
     console.log(error);
     res.status(400).send(error);
@@ -219,7 +250,7 @@ router.get("/api/insight/most_watched", async (req, res) => {
       .status(200)
       .send({ id: most_watched, title: video.title, views: totalViews });
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.toString());
   }
 });
 
