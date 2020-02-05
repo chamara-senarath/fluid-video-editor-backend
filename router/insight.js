@@ -232,6 +232,36 @@ router.get("/api/insight/user/all", async (req, res) => {
   }
 });
 
+//retrieve videos of a user by name
+router.get("/api/insight/user/search", async (req, res) => {
+  let key = req.query.key;
+  let uid = req.query.uid;
+  let videos = null;
+  try {
+    videos = await UserInsight.findOne(
+      { user: uid },
+      { _id: 0, "videos.video": 1 }
+    );
+
+    videos = await videos
+      .populate({
+        path: "videos.video",
+        model: "Video",
+        select: { title: 1 },
+        match: {
+          title: { $regex: key, $options: "i" }
+        }
+      })
+      .execPopulate();
+    if (videos.videos[0].video == null) {
+      videos.videos = [];
+    }
+    res.status(200).send(videos.videos);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
 //get most watched video
 router.get("/api/insight/most_watched", async (req, res) => {
   try {
