@@ -89,8 +89,19 @@ router.get("/api/videos", async (req, res) => {
 //retrieve videos by name
 router.get("/api/video/search", async (req, res) => {
   let key = req.query.key;
+  let option = req.query.option;
+
   try {
-    let videos = await Video.find({ title: { $regex: key, $options: "i" } });
+    let videos = null;
+    if (option == "Title") {
+      videos = await Video.find({ title: { $regex: key, $options: "i" } });
+    }
+    if (option == "Tag") {
+      videos = await Video.find({ tags: { $regex: key, $options: "i" } });
+    }
+    if (option == "Author") {
+      videos = await Video.find({ authors: { $regex: key, $options: "i" } });
+    }
     res.status(200).send(videos);
   } catch (error) {
     res.status(400).send(error);

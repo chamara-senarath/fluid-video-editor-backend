@@ -45,6 +45,7 @@ router.post("/api/insight/user", async (req, res) => {
           video.percentage >= percentage ? video.percentage : percentage;
         video.checkpoints = checkpoints;
         found = true;
+        return;
       }
     });
     if (!found) {
@@ -112,7 +113,7 @@ router.get("/api/insight/views", async (req, res) => {
       totalViews = videoInsight.totalViews;
       for (let i = 0; i < videoInsight.views.length; i++) {
         let item = videoInsight.views[i];
-        let user = await User.findById(videoInsight.views[i].user);
+        let user = await User.findById(item.user);
         users.push(user);
         viewsByGender = getPercentage(users, "gender");
         viewsByAge = getPercentage(users, "age", range);
@@ -138,7 +139,6 @@ router.get("/api/insight/views", async (req, res) => {
       viewsByLocation
     });
   } catch (error) {
-    console.log(error);
     res.status(400).send(error);
   }
 });
@@ -227,7 +227,6 @@ router.get("/api/insight/user/all", async (req, res) => {
 
     res.status(200).send(videos);
   } catch (error) {
-    console.log(error);
     res.status(400).send(error);
   }
 });
@@ -235,6 +234,16 @@ router.get("/api/insight/user/all", async (req, res) => {
 //retrieve videos of a user by name
 router.get("/api/insight/user/search", async (req, res) => {
   let key = req.query.key;
+  let option = null;
+  if (req.query.option == "Title") {
+    option = "title";
+  }
+  if (req.query.option == "Author") {
+    option = "authors";
+  }
+  if (req.query.option == "Tag") {
+    option = "tags";
+  }
   let uid = req.query.uid;
   let videos = null;
   try {
@@ -242,15 +251,14 @@ router.get("/api/insight/user/search", async (req, res) => {
       { user: uid },
       { _id: 0, "videos.video": 1 }
     );
-
+    let match = {};
+    match[option] = { $regex: key, $options: "i" };
     videos = await videos
       .populate({
         path: "videos.video",
         model: "Video",
         select: { title: 1 },
-        match: {
-          title: { $regex: key, $options: "i" }
-        }
+        match: match
       })
       .execPopulate();
     if (videos.videos[0].video == null) {
