@@ -235,6 +235,9 @@ router.get("/api/insight/user/all", async (req, res) => {
 router.get("/api/insight/user/search", async (req, res) => {
   let key = req.query.key;
   let option = null;
+  if (req.query.option == "All") {
+    option = "all";
+  }
   if (req.query.option == "Title") {
     option = "title";
   }
@@ -253,6 +256,16 @@ router.get("/api/insight/user/search", async (req, res) => {
     );
     let match = {};
     match[option] = { $regex: key, $options: "i" };
+    if (option == "all") {
+      match = {
+        $or: [
+          { title: { $regex: key, $options: "i" } },
+          { tags: { $regex: key, $options: "i" } },
+          { authors: { $regex: key, $options: "i" } }
+        ]
+      };
+    }
+    console.log(match);
     videos = await videos
       .populate({
         path: "videos.video",

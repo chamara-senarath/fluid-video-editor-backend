@@ -93,6 +93,15 @@ router.get("/api/video/search", async (req, res) => {
 
   try {
     let videos = null;
+    if (option == "All") {
+      videos = await Video.find({
+        $or: [
+          { title: { $regex: key, $options: "i" } },
+          { tags: { $regex: key, $options: "i" } },
+          { authors: { $regex: key, $options: "i" } }
+        ]
+      });
+    }
     if (option == "Title") {
       videos = await Video.find({ title: { $regex: key, $options: "i" } });
     }

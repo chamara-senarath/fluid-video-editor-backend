@@ -23,7 +23,7 @@ router.get("/api/user", async (req, res) => {
   try {
     let user = await User.findById(id);
     if (user) {
-      res.status(200).send();
+      res.status(200).send(user);
     } else {
       res.status(204).send();
     }
