@@ -54,6 +54,7 @@ router.patch("/api/video", async (req, res) => {
     video.title = req.body.title;
     video.authors = req.body.authors;
     video.tags = req.body.tags;
+    video.rating = req.body.rating;
     video.splashDuration = req.body.splashDuration;
     video.watermark = req.body.watermark;
     video.chapterMarks = req.body.chapterMarks;

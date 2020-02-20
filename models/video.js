@@ -16,6 +16,14 @@ var VideoSchema = mongoose.Schema({
       type: String
     }
   ],
+  rating: {
+    rating: {
+      type: Number
+    },
+    users: {
+      type: Number
+    }
+  },
   splashDuration: {
     type: Number
   },

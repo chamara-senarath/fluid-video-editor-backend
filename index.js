@@ -14,6 +14,7 @@ const videoRouter = require("./router/video");
 const userRouter = require("./router/user");
 const insightRouter = require("./router/insight");
 const commentRouter = require("./router/comment");
+const ratingRouter = require("./router/rating");
 
 //middleware
 app.use(cors());
@@ -22,6 +23,7 @@ app.use(videoRouter);
 app.use(userRouter);
 app.use(insightRouter);
 app.use(commentRouter);
+app.use(ratingRouter);
 
 var server = http.createServer(app);
 server.listen(port);

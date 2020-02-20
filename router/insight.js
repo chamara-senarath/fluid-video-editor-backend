@@ -221,7 +221,7 @@ router.get("/api/insight/user/all", async (req, res) => {
       .populate({
         path: "videos.video",
         model: "Video",
-        select: { title: 1 }
+        select: { title: 1, rating: 1 }
       })
       .execPopulate();
 
@@ -265,7 +265,6 @@ router.get("/api/insight/user/search", async (req, res) => {
         ]
       };
     }
-    console.log(match);
     videos = await videos
       .populate({
         path: "videos.video",
