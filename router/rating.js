@@ -1,10 +1,12 @@
 const express = require("express");
 const Video = require("../models/video");
+const Rating = require("../models/rating");
 const router = new express.Router();
 
 router.post("/api/rating", async (req, res) => {
   let vid = req.body.vid;
-  let user_rating = req.body.rating;
+  let comment = req.body.comment;
+  let user_rating = req.body.comment.rating;
   try {
     let video = await Video.findById(vid);
     if (video) {
@@ -19,9 +21,70 @@ router.post("/api/rating", async (req, res) => {
     }
 
     video.save();
+
+    let rating = await Rating.findOne({ video: vid });
+    if (rating) {
+      rating.comments.push(comment);
+    }
+    if (!rating) {
+      let c = [];
+      c.push(comment);
+      rating = Rating({
+        video: vid,
+        comments: c
+      });
+    }
+    rating.save();
+
     res.status(200).send();
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.toString());
+  }
+});
+
+router.get("/api/rating/comment", async (req, res) => {
+  let vid = req.query.vid;
+  try {
+    let rating = await Rating.findOne(
+      { video: vid },
+      { video: 1, comments: 1 }
+    );
+    rating = await rating
+      .populate({ path: "video", model: "Video", select: { title: 1, _id: 0 } })
+      .execPopulate();
+
+    let ratingList = [];
+    for (i = 1; i < 6; i++) {
+      let obj = {};
+      let stars = await Rating.findOne(
+        {
+          video: vid,
+          "comments.rating": i
+        },
+        { _id: 0, comments: 1 }
+      );
+      if (!stars) {
+        obj = {
+          rate: i,
+          amount: 0
+        };
+      } else {
+        obj = {
+          rate: i,
+          amount: stars.comments.length
+        };
+      }
+      ratingList.push(obj);
+    }
+
+    res.status(200).send({
+      id: rating._id,
+      title: rating.video.title,
+      rating: ratingList,
+      comments: rating.comments
+    });
+  } catch (error) {
+    res.status(400).send(error.toString());
   }
 });
 

@@ -5,16 +5,19 @@ var RatingSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Video"
   },
-  rating: {
-    type: Number
-  },
-  users: {
-    type: Number
-  }
-});
-
-RatingSchema.virtual("averageRating").get(function() {
-  return this.rating / this.users;
+  comments: [
+    {
+      username: {
+        type: String
+      },
+      comment: {
+        type: String
+      },
+      rating: {
+        type: Number
+      }
+    }
+  ]
 });
 
 var Rating = mongoose.model("Rating", RatingSchema);
