@@ -6,6 +6,9 @@ var VideoSchema = mongoose.Schema({
     required: true,
     trim: true
   },
+  group: {
+    type: String
+  },
   authors: [
     {
       type: String

@@ -29,6 +29,7 @@ var upload = multer({ storage: storage });
 router.post("/api/video", async (req, res) => {
   var body = {
     title: req.body.title,
+    group: req.body.group,
     authors: req.body.authors,
     tags: req.body.tags
   };
@@ -37,6 +38,7 @@ router.post("/api/video", async (req, res) => {
     await video.save();
     res.status(200).send({
       id: video._id,
+      group: video.group,
       title: video.title,
       authors: video.authors,
       tags: video.tags
@@ -79,8 +81,9 @@ router.get("/api/video", async (req, res) => {
 
 //retrieve video list
 router.get("/api/videos", async (req, res) => {
+  let group = req.query.group;
   try {
-    let videos = await Video.find();
+    let videos = await Video.find({ group: group });
     res.status(200).send(videos);
   } catch (error) {
     res.status(400).send(error);
@@ -91,26 +94,38 @@ router.get("/api/videos", async (req, res) => {
 router.get("/api/video/search", async (req, res) => {
   let key = req.query.key;
   let option = req.query.option;
+  let group = req.query.group;
 
   try {
     let videos = null;
     if (option == "All") {
       videos = await Video.find({
-        $or: [
-          { title: { $regex: key, $options: "i" } },
-          { tags: { $regex: key, $options: "i" } },
-          { authors: { $regex: key, $options: "i" } }
+        $and: [
+          { group: group },
+          {
+            $or: [
+              { title: { $regex: key, $options: "i" } },
+              { tags: { $regex: key, $options: "i" } },
+              { authors: { $regex: key, $options: "i" } }
+            ]
+          }
         ]
       });
     }
     if (option == "Title") {
-      videos = await Video.find({ title: { $regex: key, $options: "i" } });
+      videos = await Video.find({
+        $and: [{ group: group }, { title: { $regex: key, $options: "i" } }]
+      });
     }
     if (option == "Tag") {
-      videos = await Video.find({ tags: { $regex: key, $options: "i" } });
+      videos = await Video.find({
+        $and: [{ group: group }, { tags: { $regex: key, $options: "i" } }]
+      });
     }
     if (option == "Author") {
-      videos = await Video.find({ authors: { $regex: key, $options: "i" } });
+      videos = await Video.find({
+        $and: [{ group: group }, { authors: { $regex: key, $options: "i" } }]
+      });
     }
     res.status(200).send(videos);
   } catch (error) {

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-var UserSchema = mongoose.Schema({
+var AdminSchema = mongoose.Schema({
   username: {
     type: String
   },
@@ -12,15 +12,6 @@ var UserSchema = mongoose.Schema({
     type: String
   },
   group: {
-    type: String
-  },
-  age: {
-    type: Number
-  },
-  gender: {
-    type: String
-  },
-  location: {
     type: String
   },
   tokens: [
@@ -37,47 +28,47 @@ var UserSchema = mongoose.Schema({
   ]
 });
 
-UserSchema.methods.generateAuthToken = function() {
-  let user = this;
+AdminSchema.methods.generateAuthToken = function() {
+  let admin = this;
   let access = "auth";
   let token = jwt
-    .sign({ _id: user._id.toHexString(), access }, "teamfluid")
+    .sign({ _id: admin._id.toHexString(), access }, "teamfluid")
     .toString();
 
-  user.tokens = user.tokens.concat([{ access, token }]);
+  admin.tokens = admin.tokens.concat([{ access, token }]);
 
-  return user.save().then(() => {
+  return admin.save().then(() => {
     return token;
   });
 };
 
-UserSchema.statics.findByToken = function(token) {
-  let user = this;
+AdminSchema.statics.findByToken = function(token) {
+  let admin = this;
   let decoded;
   try {
     decoded = jwt.verify(token, "teamfluid");
   } catch (error) {
     return Promise.reject();
   }
-  return User.findOne({
+  return Admin.findOne({
     _id: decoded._id,
     "tokens.token": token,
     "tokens.access": "auth"
   });
 };
 
-UserSchema.statics.findByCredentials = async (username, password) => {
-  const user = await User.findOne({ username });
-  if (!user) {
+AdminSchema.statics.findByCredentials = async (username, password) => {
+  const admin = await Admin.findOne({ username });
+  if (!admin) {
     throw new Error("Unable to login. No user found");
   }
-  let passwordIsValid = bcrypt.compareSync(password, user.password);
+  let passwordIsValid = bcrypt.compareSync(password, admin.password);
   if (!passwordIsValid) {
     throw new Error("Unable to login. Password Incorrect");
   }
-  return user;
+  return admin;
 };
 
-var User = mongoose.model("User", UserSchema);
+var Admin = mongoose.model("Admin", AdminSchema);
 
-module.exports = User;
+module.exports = Admin;

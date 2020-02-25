@@ -10,6 +10,7 @@ router.post("/api/user", async (req, res) => {
   let body = {
     username: req.body.username,
     name: req.body.name,
+    group: req.body.group,
     age: req.body.age,
     gender: req.body.gender,
     location: req.body.location
@@ -37,7 +38,7 @@ router.post("/api/user/login", async (req, res) => {
   try {
     const user = await User.findByCredentials(username, password);
     const token = await user.generateAuthToken();
-    res.send({ user_id: user._id, token: token });
+    res.send({ user_id: user._id, group: user.group, token: token });
   } catch (error) {
     res.status(400).send(error.toString());
   }
@@ -45,7 +46,7 @@ router.post("/api/user/login", async (req, res) => {
 
 //retrieve user by token
 router.get("/api/user/me", auth_user, async (req, res) => {
-  res.send(req.farmer);
+  res.send(req.user);
 });
 
 //retrieve user by user id
