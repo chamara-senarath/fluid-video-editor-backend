@@ -252,7 +252,7 @@ router.get("/api/insight/user/search", async (req, res) => {
   try {
     videos = await UserInsight.findOne(
       { user: uid },
-      { _id: 0, "videos.video": 1 }
+      { _id: 0, "videos.video": 1, "videos.percentage": 1 }
     );
     let match = {};
     match[option] = { $regex: key, $options: "i" };
@@ -269,13 +269,14 @@ router.get("/api/insight/user/search", async (req, res) => {
       .populate({
         path: "videos.video",
         model: "Video",
-        select: { title: 1 },
+        select: { title: 1, rating: 1 },
         match: match
       })
       .execPopulate();
     if (videos.videos[0].video == null) {
       videos.videos = [];
     }
+
     res.status(200).send(videos.videos);
   } catch (error) {
     res.status(400).send(error);
