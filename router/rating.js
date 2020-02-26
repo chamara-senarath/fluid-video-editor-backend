@@ -53,29 +53,17 @@ router.get("/api/rating/comment", async (req, res) => {
       .populate({ path: "video", model: "Video", select: { title: 1, _id: 0 } })
       .execPopulate();
 
-    let ratingList = [];
-    for (i = 1; i < 6; i++) {
-      let obj = {};
-      let stars = await Rating.findOne(
-        {
-          video: vid,
-          "comments.rating": i
-        },
-        { _id: 0, comments: 1 }
-      );
-      if (!stars) {
-        obj = {
-          rate: i,
-          amount: 0
-        };
-      } else {
-        obj = {
-          rate: i,
-          amount: stars.comments.length
-        };
-      }
-      ratingList.push(obj);
-    }
+    let x = [0, 0, 0, 0, 0];
+    rating.comments.forEach(comment => {
+      x[comment.rating - 1]++;
+    });
+
+    let count = 0;
+    let ratingList = x.map(el => {
+      count++;
+      let obj = { rate: count, amount: el };
+      return obj;
+    });
 
     res.status(200).send({
       id: rating._id,
