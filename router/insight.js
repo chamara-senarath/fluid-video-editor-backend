@@ -217,7 +217,12 @@ router.get("/api/insight/user/all", async (req, res) => {
       { user: uid },
       { _id: 0, "videos.percentage": 1, "videos.video": 1 }
     );
-    res.status(200).send(videos.videos);
+    if (videos) {
+      res.status(200).send(videos.videos);
+    } else {
+      let emptyArr = [];
+      res.status(200).send(emptyArr);
+    }
   } catch (error) {
     res.status(400).send(error);
   }
