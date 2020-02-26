@@ -208,75 +208,15 @@ router.get("/api/insight/user", async (req, res) => {
   }
 });
 
-//retrieve all videos of a user
+//retrieve video percentages
 router.get("/api/insight/user/all", async (req, res) => {
   let uid = req.query.uid;
   let videos = null;
   try {
     videos = await UserInsight.findOne(
       { user: uid },
-      { _id: 0, "videos.video": 1, "videos.percentage": 1 }
+      { _id: 0, "videos.percentage": 1, "videos.video": 1 }
     );
-    videos = await videos
-      .populate({
-        path: "videos.video",
-        model: "Video",
-        select: { title: 1, rating: 1 }
-      })
-      .execPopulate();
-
-    res.status(200).send(videos);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-});
-
-//retrieve videos of a user by name
-router.get("/api/insight/user/search", async (req, res) => {
-  let key = req.query.key;
-  let option = null;
-  if (req.query.option == "All") {
-    option = "all";
-  }
-  if (req.query.option == "Title") {
-    option = "title";
-  }
-  if (req.query.option == "Author") {
-    option = "authors";
-  }
-  if (req.query.option == "Tag") {
-    option = "tags";
-  }
-  let uid = req.query.uid;
-  let videos = null;
-  try {
-    videos = await UserInsight.findOne(
-      { user: uid },
-      { _id: 0, "videos.video": 1, "videos.percentage": 1 }
-    );
-    let match = {};
-    match[option] = { $regex: key, $options: "i" };
-    if (option == "all") {
-      match = {
-        $or: [
-          { title: { $regex: key, $options: "i" } },
-          { tags: { $regex: key, $options: "i" } },
-          { authors: { $regex: key, $options: "i" } }
-        ]
-      };
-    }
-    videos = await videos
-      .populate({
-        path: "videos.video",
-        model: "Video",
-        select: { title: 1, rating: 1 },
-        match: match
-      })
-      .execPopulate();
-    if (videos.videos[0].video == null) {
-      videos.videos = [];
-    }
-
     res.status(200).send(videos.videos);
   } catch (error) {
     res.status(400).send(error);
