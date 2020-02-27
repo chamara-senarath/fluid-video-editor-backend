@@ -7,8 +7,9 @@ var RatingSchema = mongoose.Schema({
   },
   comments: [
     {
-      username: {
-        type: String
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
       },
       comment: {
         type: String
