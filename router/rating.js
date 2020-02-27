@@ -109,7 +109,10 @@ router.get("/api/rating/comment/me", async (req, res) => {
   try {
     let doc = await Rating.findOne({ video: vid, "comments.user": uid });
     let rating = doc.comments.find(comment => comment.user == uid);
-    res.status(200).send({ comment: rating.comment, rating: rating.rating });
+    res.status(200).send({
+      comment: rating.comment,
+      rating: rating.rating
+    });
   } catch (error) {
     res.status(400).send(error.toString());
   }
