@@ -3,6 +3,7 @@ const multer = require("multer");
 const Video = require("../models/video");
 const VideoInsight = require("../models/video_insight");
 const UserInsight = require("../models/user_insight");
+const Comment = require("../models/comment");
 const fs = require("fs");
 const router = new express.Router();
 
@@ -231,6 +232,7 @@ router.delete("/api/video/file", async (req, res) => {
       doc.videos = tempArr;
       doc.save();
     }
+    await Comment.findOneAndDelete({ video: id });
     res.status(200).send();
   } catch (error) {
     res.status(400).send(error);
