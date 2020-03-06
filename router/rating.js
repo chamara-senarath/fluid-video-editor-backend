@@ -62,6 +62,7 @@ router.post("/api/rating", async (req, res) => {
 
 router.get("/api/rating/comment", async (req, res) => {
   let vid = req.query.vid;
+  let option = req.query.option;
   try {
     let rating = await Rating.findOne(
       { video: vid },
@@ -78,7 +79,15 @@ router.get("/api/rating/comment", async (req, res) => {
         select: { name: 1, _id: 0 }
       })
       .execPopulate();
-
+    if (option == "Highest Rating") {
+      rating.comments.sort((a, b) => (a.rating < b.rating ? 1 : -1));
+    }
+    if (option == "Lowest Rating") {
+      rating.comments.sort((a, b) => (a.rating > b.rating ? 1 : -1));
+    }
+    if (option == "Newest") {
+      rating.comments.sort((a, b) => (a.date < b.date ? 1 : -1));
+    }
     let x = [0, 0, 0, 0, 0];
     rating.comments.forEach(comment => {
       x[comment.rating - 1]++;
