@@ -45,7 +45,7 @@ router.post("/api/video", async (req, res) => {
       tags: video.tags
     });
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.toString());
   }
 });
 
@@ -67,7 +67,7 @@ router.patch("/api/video", async (req, res) => {
     await video.save();
     res.status(200).send();
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.toString());
   }
 });
 
@@ -78,7 +78,7 @@ router.get("/api/video", async (req, res) => {
     let video = await Video.findById(id);
     res.status(200).send(video);
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.toString());
   }
 });
 
@@ -89,7 +89,7 @@ router.get("/api/videos", async (req, res) => {
     let videos = await Video.find({ group: group });
     res.status(200).send(videos);
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.toString());
   }
 });
 
@@ -132,7 +132,7 @@ router.get("/api/video/search", async (req, res) => {
     }
     res.status(200).send(videos);
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.toString());
   }
 });
 
@@ -165,7 +165,7 @@ router.get("/api/video/splash", async (req, res) => {
     res.contentType(contentType);
     res.status(200).send(img);
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.toString());
   }
 });
 
@@ -202,7 +202,7 @@ router.get("/api/video/watermark", async (req, res) => {
     res.contentType(contentType);
     res.status(200).send(img);
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.toString());
   }
 });
 
@@ -237,7 +237,7 @@ router.delete("/api/video/file", async (req, res) => {
     await Comment.findOneAndDelete({ video: id });
     res.status(200).send();
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.toString());
   }
 });
 

@@ -17,7 +17,7 @@ router.post("/api/comment", async (req, res) => {
     await comment.save();
     res.status(200).send();
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.toString());
   }
 });
 
@@ -31,7 +31,7 @@ router.get("/api/comment", async (req, res) => {
     let result = comments.comments.sort((a, b) => b.time - a.time);
     res.status(200).send(result);
   } catch (error) {
-    res.status(204).send();
+    res.status(400).send(error.toString());
   }
 });
 module.exports = router;

@@ -23,7 +23,7 @@ router.post("/api/admin", async (req, res) => {
       .status(200)
       .send({ admin_id: admin._id });
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.toString());
   }
 });
 
@@ -63,7 +63,7 @@ router.get("/api/admin", async (req, res) => {
       res.status(204).send();
     }
   } catch (error) {
-    res.status(204).send();
+    res.status(400).send(error.toString());
   }
 });
 
@@ -76,7 +76,7 @@ router.post("/api/admin/logout", auth_admin, async (req, res) => {
     await req.admin.save();
     res.status(200).send();
   } catch (error) {
-    res.status(500).send();
+    res.status(400).send(error.toString());
   }
 });
 module.exports = router;

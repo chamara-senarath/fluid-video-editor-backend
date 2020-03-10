@@ -21,7 +21,7 @@ router.post("/api/insight/video", async (req, res) => {
     await videoInsight.save();
     res.status(200).send();
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.toString());
   }
 });
 
@@ -59,7 +59,7 @@ router.post("/api/insight/user", async (req, res) => {
     await userInsight.save();
     res.status(200).send();
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.toString());
   }
 });
 
@@ -139,7 +139,7 @@ router.get("/api/insight/views", async (req, res) => {
       viewsByLocation
     });
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.toString());
   }
 });
 
@@ -204,7 +204,7 @@ router.get("/api/insight/user", async (req, res) => {
     }
     res.status(200).send({ percentage, questions });
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.toString());
   }
 });
 
@@ -224,7 +224,7 @@ router.get("/api/insight/user/all", async (req, res) => {
       res.status(200).send(emptyArr);
     }
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.toString());
   }
 });
 
@@ -267,7 +267,7 @@ router.get("/api/insight/least_watched", async (req, res) => {
       .status(200)
       .send({ id: least_watched, title: video.title, views: totalViews });
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.toString());
   }
 });
 
@@ -285,7 +285,7 @@ router.get("/api/insight/summary", async (req, res) => {
     }
     res.status(200).send(summary);
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.toString());
   }
 });
 

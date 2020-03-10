@@ -55,7 +55,6 @@ router.post("/api/rating", async (req, res) => {
 
     res.status(200).send();
   } catch (error) {
-    console.log(error.toString());
     res.status(400).send(error.toString());
   }
 });

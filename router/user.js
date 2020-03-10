@@ -26,7 +26,7 @@ router.post("/api/user", async (req, res) => {
       .status(200)
       .send({ user_id: user._id });
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.toString());
   }
 });
 
@@ -60,7 +60,7 @@ router.get("/api/user", async (req, res) => {
       res.status(204).send();
     }
   } catch (error) {
-    res.status(204).send();
+    res.status(400).send(error.toString());
   }
 });
 
@@ -73,7 +73,7 @@ router.post("/api/user/logout", auth_user, async (req, res) => {
     await req.user.save();
     res.status(200).send();
   } catch (error) {
-    res.status(500).send();
+    res.status(400).send(error.toString());
   }
 });
 module.exports = router;
