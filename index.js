@@ -1,5 +1,8 @@
 process.env.PORT = 3000;
-process.env.MONGODB_URI = "mongodb://localhost:27017/VideoEditor";
+// process.env.MONGODB_URI = "mongodb://localhost:27017/VideoEditor";
+process.env.MONGODB_URI = process.env.container
+  ? "mongodb://mongo:27017/VideoEditor"
+  : "mongodb://localhost:27017/VideoEditor";
 
 var http = require("http");
 var cors = require("cors");
@@ -31,3 +34,4 @@ var server = http.createServer(app);
 server.listen(port);
 
 console.log("http server listening on %d", port);
+console.log();

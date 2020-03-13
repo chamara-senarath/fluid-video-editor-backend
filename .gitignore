@@ -1,2 +1,5 @@
 node_modules/
 uploads/
+*.wt.*
+mongod.lock
+WiredTiger*
