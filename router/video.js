@@ -9,19 +9,19 @@ const router = new express.Router();
 
 //multer storage
 var storage = multer.diskStorage({
-  destination: function(req, file, cb) {
+  destination: function (req, file, cb) {
     const dir = "uploads";
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir);
     }
     cb(null, dir);
   },
-  filename: function(req, file, cb) {
+  filename: function (req, file, cb) {
     const extension = file.mimetype.split("/")[1];
     const filename = file.fieldname + "-" + req.query.id + "." + extension;
 
     cb(null, filename);
-  }
+  },
 });
 
 var upload = multer({ storage: storage });
@@ -32,7 +32,7 @@ router.post("/api/video", async (req, res) => {
     title: req.body.title,
     group: req.body.group,
     authors: req.body.authors,
-    tags: req.body.tags
+    tags: req.body.tags,
   };
   var video = Video(body);
   try {
@@ -42,7 +42,7 @@ router.post("/api/video", async (req, res) => {
       group: video.group,
       title: video.title,
       authors: video.authors,
-      tags: video.tags
+      tags: video.tags,
     });
   } catch (error) {
     res.status(400).send(error.toString());
@@ -87,8 +87,42 @@ router.get("/api/videos", async (req, res) => {
   let group = req.query.group;
   try {
     let videos = await Video.find({ group: group });
+    var files = fs.readdirSync("uploads");
+    var validFiles = [];
+    videos.forEach(async (video) => {
+      for (var i in files) {
+        if (
+          files[i].substr(0, files[i].lastIndexOf(".")) ===
+          "splash" + "-" + video._id
+        ) {
+          validFiles.push(video._id);
+        }
+      }
+    });
+    let deleteList = [];
+    for (var i = 0; i < videos.length; i++) {
+      if (!validFiles.includes(videos[i]._id)) {
+        deleteList.push(videos[i]._id);
+        await Video.findByIdAndDelete(videos[i]._id);
+      }
+    }
+    deleteList.forEach((id) => {
+      for (var i in files) {
+        if (
+          files[i].substr(0, files[i].lastIndexOf(".")) ===
+          "videoFile" + "-" + id
+        ) {
+          fs.unlink("uploads/" + files[i], function (err) {
+            if (err) throw err;
+          });
+        }
+      }
+    });
+
+    videos = await Video.find({ group: group });
     res.status(200).send(videos);
   } catch (error) {
+    console.log(error.toString());
     res.status(400).send(error.toString());
   }
 });
@@ -109,25 +143,25 @@ router.get("/api/video/search", async (req, res) => {
             $or: [
               { title: { $regex: key, $options: "i" } },
               { tags: { $regex: key, $options: "i" } },
-              { authors: { $regex: key, $options: "i" } }
-            ]
-          }
-        ]
+              { authors: { $regex: key, $options: "i" } },
+            ],
+          },
+        ],
       });
     }
     if (option == "Title") {
       videos = await Video.find({
-        $and: [{ group: group }, { title: { $regex: key, $options: "i" } }]
+        $and: [{ group: group }, { title: { $regex: key, $options: "i" } }],
       });
     }
     if (option == "Tag") {
       videos = await Video.find({
-        $and: [{ group: group }, { tags: { $regex: key, $options: "i" } }]
+        $and: [{ group: group }, { tags: { $regex: key, $options: "i" } }],
       });
     }
     if (option == "Author") {
       videos = await Video.find({
-        $and: [{ group: group }, { authors: { $regex: key, $options: "i" } }]
+        $and: [{ group: group }, { authors: { $regex: key, $options: "i" } }],
       });
     }
     res.status(200).send(videos);
@@ -213,13 +247,13 @@ router.delete("/api/video/file", async (req, res) => {
     await Video.findByIdAndDelete(id);
     var files = fs.readdirSync("uploads");
     let prefixes = ["videoFile", "splash", "watermark"];
-    prefixes.forEach(prefix => {
+    prefixes.forEach((prefix) => {
       for (var i in files) {
         if (
           files[i].substr(0, files[i].lastIndexOf(".")) ===
           prefix + "-" + id
         ) {
-          fs.unlink("uploads/" + files[i], function(err) {
+          fs.unlink("uploads/" + files[i], function (err) {
             if (err) throw err;
           });
         }
@@ -227,10 +261,10 @@ router.delete("/api/video/file", async (req, res) => {
     });
     await VideoInsight.findOneAndDelete({ video: id });
     let doc = await UserInsight.findOne({
-      videos: { $elemMatch: { video: id } }
+      videos: { $elemMatch: { video: id } },
     });
     if (doc) {
-      let tempArr = doc.videos.filter(obj => obj.video != id);
+      let tempArr = doc.videos.filter((obj) => obj.video != id);
       doc.videos = tempArr;
       doc.save();
     }
@@ -282,14 +316,14 @@ router.get("/api/video/file", async (req, res) => {
         "Content-Range": `bytes ${start}-${end}/${fileSize}`,
         "Accept-Ranges": "bytes",
         "Content-Length": chunksize,
-        "Content-Type": contentType
+        "Content-Type": contentType,
       };
       res.writeHead(206, head);
       file.pipe(res);
     } else {
       const head = {
         "Content-Length": fileSize,
-        "Content-Type": contentType
+        "Content-Type": contentType,
       };
       res.writeHead(200, head);
       fs.createReadStream(videoPath).pipe(res);
