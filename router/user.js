@@ -10,10 +10,11 @@ router.post("/api/user", async (req, res) => {
   let body = {
     username: req.body.username,
     name: req.body.name,
+    role: req.body.role,
     group: req.body.group,
-    age: req.body.age,
+    team: req.body.team,
     gender: req.body.gender,
-    location: req.body.location
+    position: req.body.position,
   };
   let hashedPassword = bcrypt.hashSync(password, 8);
   let user = User({ ...body, password: hashedPassword });
@@ -21,10 +22,7 @@ router.post("/api/user", async (req, res) => {
   try {
     await user.save();
     const token = await user.generateAuthToken();
-    res
-      .header("x-auth", token)
-      .status(200)
-      .send({ user_id: user._id });
+    res.header("x-auth", token).status(200).send({ user_id: user._id });
   } catch (error) {
     res.status(400).send(error.toString());
   }
@@ -38,7 +36,13 @@ router.post("/api/user/login", async (req, res) => {
   try {
     const user = await User.findByCredentials(username, password);
     const token = await user.generateAuthToken();
-    res.send({ user_id: user._id, group: user.group, token: token });
+    res.send({
+      user_id: user._id,
+      name: user.name,
+      role: user.role,
+      group: user.group,
+      token: token,
+    });
   } catch (error) {
     res.status(400).send(error.toString());
   }
@@ -67,7 +71,7 @@ router.get("/api/user", async (req, res) => {
 //logout
 router.post("/api/user/logout", auth_user, async (req, res) => {
   try {
-    req.user.tokens = req.user.tokens.filter(token => {
+    req.user.tokens = req.user.tokens.filter((token) => {
       return token.token === req.token;
     });
     await req.user.save();

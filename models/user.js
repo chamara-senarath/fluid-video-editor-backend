@@ -3,41 +3,45 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 var UserSchema = mongoose.Schema({
   username: {
-    type: String
+    type: String,
+    unique: true,
   },
   password: {
-    type: String
+    type: String,
   },
   name: {
-    type: String
+    type: String,
+  },
+  role: {
+    type: String,
   },
   group: {
-    type: String
+    type: String,
   },
-  age: {
-    type: Number
+  team: {
+    type: String,
   },
   gender: {
-    type: String
+    type: String,
   },
-  location: {
-    type: String
+  position: {
+    type: String,
   },
   tokens: [
     {
       access: {
         type: String,
-        required: true
+        required: true,
       },
       token: {
         type: String,
-        required: true
-      }
-    }
-  ]
+        required: true,
+      },
+    },
+  ],
 });
 
-UserSchema.methods.generateAuthToken = function() {
+UserSchema.methods.generateAuthToken = function () {
   let user = this;
   let access = "auth";
   let token = jwt
@@ -51,7 +55,7 @@ UserSchema.methods.generateAuthToken = function() {
   });
 };
 
-UserSchema.statics.findByToken = function(token) {
+UserSchema.statics.findByToken = function (token) {
   let user = this;
   let decoded;
   try {
@@ -59,10 +63,10 @@ UserSchema.statics.findByToken = function(token) {
   } catch (error) {
     return Promise.reject();
   }
-  return User.findOne({
+  return user.findOne({
     _id: decoded._id,
     "tokens.token": token,
-    "tokens.access": "auth"
+    "tokens.access": "auth",
   });
 };
 
