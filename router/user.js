@@ -28,6 +28,75 @@ router.post("/api/user", async (req, res) => {
   }
 });
 
+//update user
+router.patch("/api/user/update", async (req, res) => {
+  let password = req.body.password;
+  let body = {
+    username: req.body.username,
+    name: req.body.name,
+    role: req.body.role,
+    group: req.body.group,
+    team: req.body.team,
+    gender: req.body.gender,
+    position: req.body.position,
+  };
+  try {
+    let updateObj = null;
+    if (password != null) {
+      let hashedPassword = bcrypt.hashSync(password, 8);
+      updateObj = { ...body, password: hashedPassword };
+    } else {
+      updateObj = { ...body };
+    }
+    await User.findOneAndUpdate({ username: body.username }, updateObj);
+
+    res.status(200).send();
+  } catch (error) {
+    console.log(error);
+    res.status(400).send(error);
+  }
+});
+
+//update profile
+router.patch("/api/user/profile", async (req, res) => {
+  let username = req.body.username;
+  let gender = req.body.gender;
+  let name = req.body.name;
+  let password = req.body.password;
+  let oldPassword = req.body.oldPassword;
+
+  try {
+    let user = await User.findOne({ username });
+    let body = {
+      gender,
+      name,
+    };
+    if (password && oldPassword) {
+      let passwordIsValid = bcrypt.compareSync(oldPassword, user.password);
+      if (!passwordIsValid) {
+        throw new Error("Incorrect old Password!");
+      }
+      let hashedPassword = bcrypt.hashSync(password, 8);
+      body = { ...body, password: hashedPassword };
+    }
+    await User.findOneAndUpdate({ username }, body);
+    res.status(200).send();
+  } catch (error) {
+    res.send({ error: error.toString() });
+  }
+});
+
+//delete user
+router.delete("/api/user/delete", async (req, res) => {
+  let username = req.query.username;
+  try {
+    await User.findOneAndDelete({ username });
+    res.status(200).send();
+  } catch (error) {
+    res.status(400).send(error.toString());
+  }
+});
+
 //login
 router.post("/api/user/login", async (req, res) => {
   let username = req.body.username;
@@ -51,6 +120,23 @@ router.post("/api/user/login", async (req, res) => {
 //retrieve user by token
 router.get("/api/user/me", auth_user, async (req, res) => {
   res.send(req.user);
+});
+
+//retrieve userList
+
+router.get("/api/user/search", async (req, res) => {
+  try {
+    let users = await User.find({}, [
+      "username",
+      "name",
+      "role",
+      "group",
+      "team",
+      "gender",
+      "position",
+    ]);
+    res.status(200).send(users);
+  } catch (error) {}
 });
 
 //retrieve user by user id

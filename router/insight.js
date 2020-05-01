@@ -38,7 +38,7 @@ router.post("/api/insight/user", async (req, res) => {
       userInsight = UserInsight({ user: uid });
     }
     let found = false;
-    userInsight.videos.forEach(video => {
+    userInsight.videos.forEach((video) => {
       if (video.video == vid) {
         video.questions = questions;
         video.percentage =
@@ -53,7 +53,7 @@ router.post("/api/insight/user", async (req, res) => {
         video: vid,
         questions: questions,
         percentage: percentage,
-        checkpoints: checkpoints
+        checkpoints: checkpoints,
       });
     }
     await userInsight.save();
@@ -66,25 +66,18 @@ router.post("/api/insight/user", async (req, res) => {
 //retrieve views for a given video
 router.get("/api/insight/views", async (req, res) => {
   let vid = req.query.vid;
-  let range = req.query.range.split(",");
   let lastWeekViews = 0;
   let lastMonthViews = 0;
   let lastYearViews = 0;
   let totalViews = 0;
   let viewsByGender = {};
-  let viewsByAge = {};
-  let viewsByLocation = {};
+  let viewsByTeam = {};
+  let viewsByPosition = {};
 
   function isBetween(timestamp) {
-    last_week = moment()
-      .subtract(7, "days")
-      .calendar();
-    last_month = moment()
-      .subtract(7, "months")
-      .calendar();
-    last_year = moment()
-      .subtract(7, "years")
-      .calendar();
+    last_week = moment().subtract(7, "days").calendar();
+    last_month = moment().subtract(7, "months").calendar();
+    last_year = moment().subtract(7, "years").calendar();
 
     let week = moment(timestamp).isBetween(
       moment(last_week, "MM-DD-YYYY"),
@@ -102,7 +95,7 @@ router.get("/api/insight/views", async (req, res) => {
     return {
       week,
       month,
-      year
+      year,
     };
   }
 
@@ -116,8 +109,9 @@ router.get("/api/insight/views", async (req, res) => {
         let user = await User.findById(item.user);
         users.push(user);
         viewsByGender = getPercentage(users, "gender");
-        viewsByAge = getPercentage(users, "age", range);
-        viewsByLocation = getPercentage(users, "location");
+        viewsByTeam = getPercentage(users, "team");
+        viewsByPosition = getPercentage(users, "position");
+
         if (isBetween(item.date).week) {
           lastWeekViews++;
         }
@@ -135,8 +129,8 @@ router.get("/api/insight/views", async (req, res) => {
       lastMonthViews,
       lastYearViews,
       viewsByGender,
-      viewsByAge,
-      viewsByLocation
+      viewsByTeam,
+      viewsByPosition,
     });
   } catch (error) {
     res.status(400).send(error.toString());
@@ -156,23 +150,23 @@ router.get("/api/insight/user", async (req, res) => {
     }
     let insight = await UserInsight.findOne({
       user: uid,
-      videos: { $elemMatch: { video: vid } }
+      videos: { $elemMatch: { video: vid } },
     });
 
     let insightQuestions = [];
     if (insight) {
-      let video = insight.videos.find(video => video.video == vid);
+      let video = insight.videos.find((video) => video.video == vid);
       percentage = video.percentage;
       insightQuestions = [
         ...insight.videos
-          .filter(video => video.video == vid)
-          .map(obj => {
+          .filter((video) => video.video == vid)
+          .map((obj) => {
             return obj.questions;
-          })[0]
+          })[0],
       ];
     }
     let videoQuestions = video.questions;
-    videoQuestions.forEach(question => {
+    videoQuestions.forEach((question) => {
       let q = {
         _id: question._id,
         qid: question._id,
@@ -185,7 +179,7 @@ router.get("/api/insight/user", async (req, res) => {
         is_answered: false,
         is_skipped: false,
         is_correct: false,
-        earn: 0
+        earn: 0,
       };
       questions.push(q);
     });
@@ -234,7 +228,7 @@ router.get("/api/insight/most_watched", async (req, res) => {
     let videoInsight = await VideoInsight.find();
     let totalViews = 0;
     let most_watched;
-    videoInsight.forEach(video => {
+    videoInsight.forEach((video) => {
       if (video.totalViews >= totalViews) {
         totalViews = video.totalViews;
         most_watched = video.video;
@@ -256,7 +250,7 @@ router.get("/api/insight/least_watched", async (req, res) => {
     let videoInsight = await VideoInsight.find();
     let totalViews = videoInsight[0].totalViews;
     let least_watched;
-    videoInsight.forEach(video => {
+    videoInsight.forEach((video) => {
       if (video.totalViews <= totalViews) {
         totalViews = video.totalViews;
         least_watched = video.video;
