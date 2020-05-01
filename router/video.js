@@ -71,6 +71,17 @@ router.patch("/api/video", async (req, res) => {
   }
 });
 
+//retrieve video by videoTitle
+router.get("/api/video/title", async (req, res) => {
+  let title = req.query.title;
+  try {
+    let video = await Video.findOne({ title });
+    res.send({ id: video._id });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
 //retrieve video file info
 router.get("/api/video", async (req, res) => {
   let id = req.query.id;
