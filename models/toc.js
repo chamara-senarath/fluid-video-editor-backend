@@ -1,8 +1,11 @@
 const mongoose = require("mongoose");
 
 var TOCSchema = mongoose.Schema({
-  TOC: {
+  data: {
     type: Object,
+  },
+  nodes: {
+    type: Array,
   },
 });
 
