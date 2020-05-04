@@ -100,6 +100,7 @@ router.get("/api/videos", async (req, res) => {
     let videos = await Video.find({ group: group });
     var files = fs.readdirSync("uploads");
     var validFiles = [];
+
     videos.forEach(async (video) => {
       for (var i in files) {
         if (
@@ -114,24 +115,45 @@ router.get("/api/videos", async (req, res) => {
     for (var i = 0; i < videos.length; i++) {
       if (!validFiles.includes(videos[i]._id)) {
         deleteList.push(videos[i]._id);
-        await Video.findByIdAndDelete(videos[i]._id);
       }
     }
-    deleteList.forEach((id) => {
+
+    const isOld = (filename) => {
+      var stats = fs.statSync("uploads/" + filename);
+      var mtime = stats.mtime;
+      const date1 = new Date(mtime);
+      const date2 = Date.now();
+      const diffTime = Math.abs(date2 - date1);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      if (diffDays > 2) {
+        return true;
+      } else {
+        return false;
+      }
+    };
+
+    deleteList.forEach(async (id) => {
       for (var i in files) {
         if (
           files[i].substr(0, files[i].lastIndexOf(".")) ===
           "videoFile" + "-" + id
         ) {
-          fs.unlink("uploads/" + files[i], function (err) {
-            if (err) throw err;
-          });
+          if (isOld(files[i])) {
+            await Video.findByIdAndDelete(id);
+
+            fs.unlink("uploads/" + files[i], function (err) {
+              if (err) throw err;
+            });
+          }
         }
       }
     });
 
-    videos = await Video.find({ group: group });
-    res.status(200).send(videos);
+    let modifiedVideo = videos.filter((video) =>
+      validFiles.includes(video._id)
+    );
+
+    res.status(200).send(modifiedVideo);
   } catch (error) {
     console.log(error.toString());
     res.status(400).send(error.toString());

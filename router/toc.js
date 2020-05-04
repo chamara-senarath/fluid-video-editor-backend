@@ -4,14 +4,12 @@ const router = new express.Router();
 
 //post
 router.post("/api/toc/new", async (req, res) => {
-  let data = req.body.data;
   let nodes = req.body.nodes;
   try {
     let existTOC = await TOC.findOne();
     if (!existTOC) {
-      existTOC = await TOC({ data, nodes });
+      existTOC = await TOC({ nodes });
     } else {
-      existTOC.data = data;
       existTOC.nodes = nodes;
     }
     existTOC.save();
