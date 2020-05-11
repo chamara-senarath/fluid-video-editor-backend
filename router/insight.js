@@ -103,10 +103,12 @@ router.get("/api/insight/views", async (req, res) => {
     let videoInsight = await VideoInsight.findOne({ video: vid });
     if (videoInsight) {
       let users = [];
-      totalViews = videoInsight.totalViews;
       for (let i = 0; i < videoInsight.views.length; i++) {
         let item = videoInsight.views[i];
         let user = await User.findById(item.user);
+        if (user === null) {
+          continue
+        }
         users.push(user);
         viewsByGender = getPercentage(users, "gender");
         viewsByTeam = getPercentage(users, "team");
@@ -122,6 +124,8 @@ router.get("/api/insight/views", async (req, res) => {
           lastYearViews++;
         }
       }
+      totalViews = users.length;
+
     }
     res.status(200).send({
       totalViews,

@@ -75,9 +75,21 @@ router.get("/api/rating/comment", async (req, res) => {
       .populate({
         path: "comments.user",
         model: "User",
-        select: { name: 1, _id: 0 }
+        select: { name: 1, _id: 0 },
+
       })
       .execPopulate();
+
+    let comments = rating.comments.map(c => {
+      let modifiedComment = c
+      if (c.user === null) {
+        let user = { name: "Deleted User 🔎" }
+        modifiedComment = { date: c.date, _id: c._id, user: user, comment: c.comment, rating: c.rating }
+      }
+      return modifiedComment
+    })
+    rating.comments = comments
+
     if (option == "Highest Rating") {
       rating.comments.sort((a, b) => (a.rating < b.rating ? 1 : -1));
     }

@@ -6,6 +6,7 @@ const auth_user = require("../middleware/auth_user");
 
 //register
 router.post("/api/user", async (req, res) => {
+  console.log("hit")
   let password = req.body.password;
   let body = {
     username: req.body.username,
@@ -136,7 +137,7 @@ router.get("/api/user/search", async (req, res) => {
       "position",
     ]);
     res.status(200).send(users);
-  } catch (error) {}
+  } catch (error) { }
 });
 
 //retrieve user by user id
